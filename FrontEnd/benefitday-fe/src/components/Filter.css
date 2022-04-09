@@ -1,0 +1,16 @@
+.header {
+    width: 100%;
+    text-align: center;
+    background: #66A073;
+    color: #ffffff;
+}
+
+.content {
+    text-align: center;
+}
+
+.local-info,
+.income,
+.personal-info {
+    display: inline-block;
+}

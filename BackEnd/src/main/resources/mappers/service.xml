@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.recommend.mapper.ServiceMapper">
+
+
+	<select id="list" parameterType="User" resultType="Service">
+		select *
+		from service s
+		join tag t
+		on s.서비스ID = t.서비스ID
+		where t.지원대상태그 like CONCAT('%',if(#{gender}='mail','남성','여성'),'%')
+		and t.지원대상태그 like CONCAT('%',#{incomeRange},'%')
+        and t.지원대상태그 like CONCAT('%',#{personalChar},'%')
+		and ((#{familyChar} = '해당사항없음' and t.지원대상태그 like '%') or (#{familyChar} != '해당사항없음' and t.지원대상태그 like CONCAT('%',#{familyChar},'%')))
+        and (s.소관기관명 = #{location} or (s.소관기관명 not like '%도' and s.소관기관명 not like '%시' and s.소관기관명 not like '%군' and s.소관기관명 not like '%구'))
+        and s.지원유형 like CONCAT('%',#{type},'%')
+        order by (s.조회수+0) desc;
+	</select>
+	
+	<select id="search" parameterType="String" resultType="Service">
+		select *
+		from service s
+		where s.부서명 like CONCAT('%',#{keyword},'%')
+		or s.서비스명 like CONCAT('%',#{keyword},'%')
+		or s.서비스목적 like CONCAT('%',#{keyword},'%')
+		or s.선정기준 like CONCAT('%',#{keyword},'%')
+		or s.소관기관명 like CONCAT('%',#{keyword},'%')
+		or s.신청방법 like CONCAT('%',#{keyword},'%')
+		or s.지원내용 like CONCAT('%',#{keyword},'%')
+		or s.지원대상 like CONCAT('%',#{keyword},'%')
+		or s.지원유형 like CONCAT('%',#{keyword},'%')
+        order by (s.조회수+0) desc;
+	</select>
+	
+	<select id="limit" parameterType="String" resultType="Service">
+		select * 
+		from service s
+		join tag t
+		on s.서비스ID = t.서비스ID
+		where t.지원대상태그 like CONCAT('%',if(#{gender}='mail','남성','여성'),'%')
+		and t.지원대상태그 like CONCAT('%',#{incomeRange},'%')
+        and t.지원대상태그 like CONCAT('%',#{personalChar},'%')
+		and ((#{familyChar} = '해당사항없음' and t.지원대상태그 like '%') or (#{familyChar} != '해당사항없음' and t.지원대상태그 like CONCAT('%',#{familyChar},'%')))
+        and (s.소관기관명 = #{location} or (s.소관기관명 not like '%도' and s.소관기관명 not like '%시' and s.소관기관명 not like '%군' and s.소관기관명 not like '%구'))
+        order by (s.조회수+0) desc
+        limit 20;
+	</select>
+	
+	<select id="views" parameterType="String" resultType="Service">
+		select *
+		from service s
+		order by (s.조회수+0) desc
+        limit 20;
+	</select>
+	
+	<select id="myloglist" parameterType="String" resultType="Log">
+		select * 
+		from log
+		where user_id = (select user_id from user where email = #{email})
+	</select>
+	
+	<select id="loglist" parameterType="String" resultType="Log">
+		select * 
+		from log
+		where user_id = #{userId}
+	</select>
+	
+	<insert id="log" parameterType="LogRequest">
+		insert into log(
+			service_id, user_id
+		) values (
+			#{serviceId}, (select user_id from user where email = #{email})
+		)
+	</insert>
+	
+	<select id="loglistall" parameterType="String" resultType="Log">
+		select * 
+		from log
+		order by log_date desc;
+	</select>
+	
+</mapper>
