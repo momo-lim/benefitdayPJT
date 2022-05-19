@@ -18,6 +18,7 @@ import {
   Button,
   TextField,
 } from '@mui/material';
+import axios from 'axios';
 
 function Filter() {
   const [metroCode, setMetroCode] = useState(-1);
@@ -37,24 +38,29 @@ function Filter() {
     result: string;
     error: string;
   }
+  const value = localStorage.getItem('accessToken') as string;
 
   const submit = () => {
-    API.post<object, filterResult>('/user/setInfo', {
-      location: province + ' ' + city,
-      incomeRange: income,
-      personalChar: personal,
-      familyChar: family,
-      birthday: birthday,
-    })
+    axios
+      .post<object, filterResult>(
+        '/user/setInfo',
+        {
+          location: province + ' ' + city,
+          incomeRange: income,
+          personalChar: personal,
+          familyChar: family,
+          birthday: birthday,
+        },
+        {
+          headers: {
+            accessToken: value,
+          },
+        },
+      )
       .then((res) => {
         console.log(res);
         alert('필터가 성공적으로 저장되었어요.');
-        API.post<object, filterResult>('/user/recommendList')
-        .then((res) => {
-          alert("추천 리스트가 성공적으로 생성되었습니다.");
-          window.location.reload();
-        })
-        .catch((err) => alert('오류가 발생했어요. 다시 시도해주세요.'));
+
         navigate('/main');
       })
       .catch((err) => {
